@@ -7,8 +7,9 @@
     <style>
       body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif; margin: 2rem auto; max-width: 800px; padding: 0 1rem; }
       h1 { font-size: 1.5rem; }
+      h2 { font-size: 1.25rem; margin-top: 0; }
       textarea { width: 100%; min-height: 160px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, monospace; }
-      button { padding: 0.5rem 1rem; }
+      button { padding: 0.5rem 1rem; margin-right: 0.25rem; }
       .items { margin-top: 1rem; }
       .item { display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; }
       .muted { color: #6b7280; font-size: 0.875rem; }
@@ -24,20 +25,26 @@
     <div class="row">
       <label class="row"><input id="save_note" type="checkbox" checked /> Save as note</label>
       <button id="extract">Extract</button>
+      <button id="extract_llm">Extract LLM</button>
+      <button id="list_notes">List Notes</button>
     </div>
 
     <div class="items" id="items"></div>
+    <div id="notes_section" style="margin-top: 2rem; display: none;">
+      <h2>All Notes</h2>
+      <div id="notes_list"></div>
+    </div>
 
     <script>
       const $ = (sel) => document.querySelector(sel);
       const itemsEl = $('#items');
-      const btn = $('#extract');
-      btn.addEventListener('click', async () => {
+      
+      const extractItems = async (endpoint) => {
         const text = $('#text').value;
         const save = $('#save_note').checked;
         itemsEl.textContent = 'Extracting...';
         try {
-          const res = await fetch('/action-items/extract', {
+          const res = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text, save_note: save }),
@@ -65,7 +72,53 @@
           console.error(err);
           itemsEl.textContent = 'Error extracting items';
         }
+      };
+
+      const btn = $('#extract');
+      btn.addEventListener('click', () => extractItems('/action-items/extract'));
+      
+      const btnLlm = $('#extract_llm');
+      btnLlm.addEventListener('click', () => extractItems('/action-items/extract-llm'));
+      
+      const btnListNotes = $('#list_notes');
+      btnListNotes.addEventListener('click', async () => {
+        const notesSection = $('#notes_section');
+        const notesList = $('#notes_list');
+        notesSection.style.display = 'block';
+        notesList.textContent = 'Loading notes...';
+        try {
+          const res = await fetch('/notes');
+          if (!res.ok) throw new Error('Request failed');
+          const notes = await res.json();
+          if (!notes || notes.length === 0) {
+            notesList.innerHTML = '<p class="muted">No notes found.</p>';
+            return;
+          }
+          notesList.innerHTML = notes.map(note => (
+            `<div style="border: 1px solid #ddd; padding: 0.75rem; margin-bottom: 0.75rem; border-radius: 4px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong>Note #${note.id}</strong>
+                <span class="muted" style="font-size: 0.8rem;">${new Date(note.created_at).toLocaleString()}</span>
+              </div>
+              <p style="margin: 0.5rem 0 0 0; white-space: pre-wrap; word-wrap: break-word; max-height: 150px; overflow-y: auto;">${escapeHtml(note.content)}</p>
+            </div>`
+          )).join('');
+        } catch (err) {
+          console.error(err);
+          notesList.textContent = 'Error loading notes';
+        }
       });
+      
+      function escapeHtml(text) {
+        const map = {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, m => map[m]);
+      }
 
     </script>
   </body>

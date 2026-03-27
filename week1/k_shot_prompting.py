@@ -7,15 +7,49 @@ load_dotenv()
 NUM_RUNS_TIMES = 5
 
 # TODO: Fill this in!
-YOUR_SYSTEM_PROMPT = ""
+# YOUR_SYSTEM_PROMPT = """
+# You are an expert text manipulator who loves classic literature. 
+# Your task is to reverse the order of letters in the given word. 
+# You must ONLY output the reversed word, with absolutely no other text, punctuation, or explanation.
 
-USER_PROMPT = """
-Reverse the order of letters in the following word. Only output the reversed word, no other text:
+# Here are some examples of how you should do it:
+
+# Word: hamlet
+# Reversed: telmah
+
+# Word: dracula
+# Reversed: alucard
+
+# Word: odyssey
+# Reversed: yessydo
+
+# Word: gatsby
+# Reversed: ybstag
+# """
+
+YOUR_SYSTEM_PROMPT = """
+You are a perfect text reversal engine. You process text strictly character-by-character. 
+You ONLY output the reversed word, with no extra text.
+
+Here are examples of how to reverse tricky words correctly:
+
+User: Reverse the order of letters in the following word. Only output the reversed word, no other text:
+
+status
+Assistant: sutats
+
+User: Reverse the order of letters in the following word. Only output the reversed word, no other text:
+
+http
+Assistant: ptth
+
+User: Reverse the order of letters in the following word. Only output the reversed word, no other text:
 
 httpstatus
+Assistant: sutatsptth
 """
 
-
+USER_PROMPT = "Reverse the order of letters in the following word. Only output the reversed word, no other text:\n\nhttpstatus"
 EXPECTED_OUTPUT = "sutatsptth"
 
 def test_your_prompt(system_prompt: str) -> bool:

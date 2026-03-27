@@ -15,7 +15,17 @@ Keep the implementation minimal.
 """
 
 # TODO: Fill this in!
-YOUR_REFLEXION_PROMPT = ""
+YOUR_REFLEXION_PROMPT = """
+You are a strict Python code reviewer. The previous implementation failed because it used generic methods like `isalpha()` or `isalnum()` instead of precise checks.
+You MUST rewrite the function to explicitly check for ALL of these exact conditions:
+1. len(password) >= 8
+2. any(c.islower() for c in password)
+3. any(c.isupper() for c in password)
+4. any(c.isdigit() for c in password)
+5. any(c in "!@#$%^&*()-_" for c in password)
+
+Output ONLY a single fenced Python code block (using ```python ... ```). No explanations or prose.
+"""
 
 
 # Ground-truth test suite used to evaluate generated code
@@ -92,11 +102,14 @@ def generate_initial_function(system_prompt: str) -> str:
 
 
 def your_build_reflexion_context(prev_code: str, failures: List[str]) -> str:
-    """TODO: Build the user message for the reflexion step using prev_code and failures.
-
-    Return a string that will be sent as the user content alongside the reflexion system prompt.
-    """
-    return ""
+    error_list = "\n".join(f"- {f}" for f in failures)
+    return (
+        f"Here is your previous code:\n"
+        f"```python\n{prev_code}\n```\n\n"
+        f"It failed with these errors:\n"
+        f"{error_list}\n\n"
+        f"Fix the code immediately. Do not use `isalpha()` or `isalnum()`. You must explicitly use `c.isupper()`, `c.islower()`, `c.isdigit()`, and check if the character is inside the '!@#$%^&*()-_' string."
+    )
 
 
 def apply_reflexion(

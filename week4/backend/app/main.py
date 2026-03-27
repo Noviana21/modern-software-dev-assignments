@@ -32,3 +32,5 @@ async def root() -> FileResponse:
 # Routers
 app.include_router(notes_router.router)
 app.include_router(action_items_router.router)
+
+# Copilot, please generate a new FastAPI GET endpoint at '/api/ping' that returns {"status": "ok", "db": "connected"} if the database is accessible.
