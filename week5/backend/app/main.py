@@ -32,3 +32,5 @@ async def root() -> FileResponse:
 # Routers
 app.include_router(notes_router.router)
 app.include_router(action_items_router.router)
+
+# Copilot, create a simple GET /api/ping endpoint that returns {"status": "ok"}
