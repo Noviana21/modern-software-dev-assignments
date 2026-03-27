@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class NoteCreate(BaseModel):
@@ -42,5 +42,9 @@ class ActionItemRead(BaseModel):
 class ActionItemPatch(BaseModel):
     description: str | None = None
     completed: bool | None = None
+
+
+class StatsRead(BaseModel):
+    note_count: int = Field(ge=0)
 
 

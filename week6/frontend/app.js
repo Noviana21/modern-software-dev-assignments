@@ -5,40 +5,47 @@ async function fetchJSON(url, options) {
 }
 
 async function loadNotes(params = {}) {
-  const list = document.getElementById('notes');
-  list.innerHTML = '';
+  const list = document.getElementById("notes");
+  list.textContent = "";
   const query = new URLSearchParams(params);
-  const notes = await fetchJSON('/notes/?' + query.toString());
+  const notes = await fetchJSON("/notes/?" + query.toString());
   for (const n of notes) {
-    const li = document.createElement('li');
-    li.innerHTML = `<strong>${n.title}</strong>: ${n.content}`;
+    const li = document.createElement("li");
+    const title = document.createElement("strong");
+    title.textContent = n.title;
+    li.appendChild(title);
+    li.appendChild(document.createTextNode(": "));
+
+    const content = document.createElement("span");
+    content.textContent = n.content;
+    li.appendChild(content);
     list.appendChild(li);
   }
 }
 
 async function loadActions(params = {}) {
-  const list = document.getElementById('actions');
-  list.innerHTML = '';
+  const list = document.getElementById("actions");
+  list.innerHTML = "";
   const query = new URLSearchParams(params);
-  const items = await fetchJSON('/action-items/?' + query.toString());
+  const items = await fetchJSON("/action-items/?" + query.toString());
   for (const a of items) {
-    const li = document.createElement('li');
-    li.textContent = `${a.description} [${a.completed ? 'done' : 'open'}]`;
+    const li = document.createElement("li");
+    li.textContent = `${a.description} [${a.completed ? "done" : "open"}]`;
     if (!a.completed) {
-      const btn = document.createElement('button');
-      btn.textContent = 'Complete';
+      const btn = document.createElement("button");
+      btn.textContent = "Complete";
       btn.onclick = async () => {
-        await fetchJSON(`/action-items/${a.id}/complete`, { method: 'PUT' });
+        await fetchJSON(`/action-items/${a.id}/complete`, { method: "PUT" });
         loadActions(params);
       };
       li.appendChild(btn);
     } else {
-      const btn = document.createElement('button');
-      btn.textContent = 'Reopen';
+      const btn = document.createElement("button");
+      btn.textContent = "Reopen";
       btn.onclick = async () => {
         await fetchJSON(`/action-items/${a.id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ completed: false }),
         });
         loadActions(params);
@@ -49,44 +56,48 @@ async function loadActions(params = {}) {
   }
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('note-form').addEventListener('submit', async (e) => {
+window.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("note-form").addEventListener("submit", async (e) => {
     e.preventDefault();
-    const title = document.getElementById('note-title').value;
-    const content = document.getElementById('note-content').value;
-    await fetchJSON('/notes/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const title = document.getElementById("note-title").value;
+    const content = document.getElementById("note-content").value;
+    await fetchJSON("/notes/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title, content }),
     });
     e.target.reset();
     loadNotes();
   });
 
-  document.getElementById('note-search-btn').addEventListener('click', async () => {
-    const q = document.getElementById('note-search').value;
-    loadNotes({ q });
-  });
-
-  document.getElementById('action-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const description = document.getElementById('action-desc').value;
-    await fetchJSON('/action-items/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ description }),
+  document
+    .getElementById("note-search-btn")
+    .addEventListener("click", async () => {
+      const q = document.getElementById("note-search").value;
+      loadNotes({ q });
     });
-    e.target.reset();
-    loadActions();
-  });
 
-  document.getElementById('filter-completed').addEventListener('change', (e) => {
-    const checked = e.target.checked;
-    loadActions({ completed: checked });
-  });
+  document
+    .getElementById("action-form")
+    .addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const description = document.getElementById("action-desc").value;
+      await fetchJSON("/action-items/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description }),
+      });
+      e.target.reset();
+      loadActions();
+    });
+
+  document
+    .getElementById("filter-completed")
+    .addEventListener("change", (e) => {
+      const checked = e.target.checked;
+      loadActions({ completed: checked });
+    });
 
   loadNotes();
   loadActions();
 });
-
-

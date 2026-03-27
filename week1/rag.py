@@ -37,7 +37,13 @@ QUESTION = (
 
 
 # TODO: Fill this in!
-YOUR_SYSTEM_PROMPT = ""
+YOUR_SYSTEM_PROMPT = """
+You are an expert Python backend developer.
+Your task is to write a Python function based EXACTLY on the provided API documentation context.
+Do not invent URLs, endpoints, or headers. Use strictly what is defined in the Context.
+You must output ONLY a valid Python code block (using ```python ... ```).
+Do not write any other text, explanations, or usage examples outside the code block.
+"""
 
 
 # For this simple example
@@ -51,12 +57,17 @@ REQUIRED_SNIPPETS = [
 ]
 
 
-def YOUR_CONTEXT_PROVIDER(corpus: List[str]) -> List[str]:
-    """TODO: Select and return the relevant subset of documents from CORPUS for this task.
+# def YOUR_CONTEXT_PROVIDER(corpus: List[str]) -> List[str]:
+#     """TODO: Select and return the relevant subset of documents from CORPUS for this task.
 
-    For example, return [] to simulate missing context, or [corpus[0]] to include the API docs.
-    """
-    return []
+#     For example, return [] to simulate missing context, or [corpus[0]] to include the API docs.
+#     """
+#     return []
+
+def YOUR_CONTEXT_PROVIDER(corpus: List[str]) -> List[str]:
+    """Select and return the relevant subset of documents from CORPUS for this task."""
+    # Kita harus mengembalikan isi file 'api_docs.txt' yang sudah di-load ke dalam parameter corpus
+    return corpus
 
 
 def make_user_prompt(question: str, context_docs: List[str]) -> str:
@@ -97,7 +108,8 @@ def test_your_prompt(system_prompt: str, context_provider: Callable[[List[str]],
     for idx in range(NUM_RUNS_TIMES):
         print(f"Running test {idx + 1} of {NUM_RUNS_TIMES}")
         response = chat(
-            model="llama3.1:8b",
+            # model="llama3.1:8b",
+            model="mistral-nemo:12b",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},

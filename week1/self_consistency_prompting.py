@@ -9,7 +9,18 @@ load_dotenv()
 NUM_RUNS_TIMES = 5
 
 # TODO: Fill this in! Try to get as close to 100% correctness across all runs as possible.
-YOUR_SYSTEM_PROMPT = ""
+YOUR_SYSTEM_PROMPT = """
+You are an expert mathematical problem solver. You must think step-by-step to solve the word problem.
+Follow this logical path:
+1. Identify the total distance of the trip.
+2. Identify the exact mile marker of the first stop.
+3. Identify the exact mile marker of the second stop (calculate this by subtracting the remaining miles from the total trip distance).
+4. Calculate the distance traveled between the first and second stops.
+
+Write out your reasoning clearly.
+Important: Your very last line MUST be strictly in this format:
+Answer: <number>
+"""
 
 USER_PROMPT = """
 Solve this problem, then give the final answer on the last line as "Answer: <number>".

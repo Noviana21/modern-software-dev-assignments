@@ -8,7 +8,20 @@ load_dotenv()
 NUM_RUNS_TIMES = 5
 
 # TODO: Fill this in!
-YOUR_SYSTEM_PROMPT = ""
+YOUR_SYSTEM_PROMPT = """
+You are an expert mathematician. You MUST think step-by-step and write out your reasoning clearly before giving the final answer.
+
+Follow this exact reasoning process:
+1. Identify the base, exponent, and the modulo.
+2. Note the mathematical fact: The repeating cycle length for powers of 3 modulo 100 is exactly 20. This means 3^20 is congruent to 1 (mod 100).
+3. Divide the large exponent (12345) by this cycle length (20) to find the remainder.
+4. Calculate the base (3) raised to that remainder.
+5. Take the result modulo 100 to get the final answer.
+
+Take a deep breath and work through the math carefully step-by-step.
+Important: Your very last line MUST be strictly in this format:
+Answer: <number>
+"""
 
 
 USER_PROMPT = """
@@ -48,7 +61,8 @@ def test_your_prompt(system_prompt: str) -> bool:
     for idx in range(NUM_RUNS_TIMES):
         print(f"Running test {idx + 1} of {NUM_RUNS_TIMES}")
         response = chat(
-            model="llama3.1:8b",
+            # model="llama3.1:8b",
+            model="mistral-nemo:12b",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": USER_PROMPT},

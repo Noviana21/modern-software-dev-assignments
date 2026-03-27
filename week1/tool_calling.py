@@ -70,7 +70,21 @@ TOOL_REGISTRY: Dict[str, Callable[..., str]] = {
 # ==========================
 
 # TODO: Fill this in!
-YOUR_SYSTEM_PROMPT = ""
+YOUR_SYSTEM_PROMPT = """
+You are a strict API bot that exclusively outputs valid JSON objects to call predefined tools.
+You have access to the following tool:
+- Name: output_every_func_return_type
+    Description: Analyzes a Python file and returns a list of function return types.
+    Arguments: None required.
+
+When the user asks you to call the tool, you MUST respond with ONLY the following JSON object:
+{
+    "tool": "output_every_func_return_type",
+    "args": {}
+}
+
+Do not include any explanations, markdown formatting, or extra text. Output the raw JSON object only.
+"""
 
 
 def resolve_path(p: str) -> str:
